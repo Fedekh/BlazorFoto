@@ -1,5 +1,8 @@
 using BlazorFoto.Client.Pages;
 using BlazorFoto.Components;
+using BlazorFoto;
+using Microsoft.EntityFrameworkCore;
+using BlazorFoto.Components.DB;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddDbContext<Context>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
