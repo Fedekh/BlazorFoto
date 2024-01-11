@@ -1,8 +1,7 @@
-using BlazorFoto.Client.Pages;
 using BlazorFoto.Components;
-using BlazorFoto;
-using Microsoft.EntityFrameworkCore;
 using BlazorFoto.Components.DB;
+using BlazorFoto.Utility;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,18 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7188/") });
+builder.Services.AddHttpClient("MyApiClient", client => client.BaseAddress = new Uri("https://localhost:7188/"));
+
+
+builder.Services.AddRadzenComponents();
+
 builder.Services.AddDbContext<Context>();
+builder.Services.AddScoped<Context, Context>();
+builder.Services.AddScoped<IRepositoryFoto, RepositoryFoto>();
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,6 +40,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

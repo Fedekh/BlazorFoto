@@ -1,0 +1,18 @@
+﻿<div class="cardk">
+    <img src="@Img" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">@Name</h5>
+        <p class="card-text">@Description</p>
+    </div>
+</div>
+
+
+@code{
+    [Parameter]
+    public string? Name {get;set;}
+    [Parameter]
+    public string? Description { get; set; }
+    [Parameter]
+    public string? Img { get; set; }
+
+}
