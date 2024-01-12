@@ -1,0 +1,40 @@
+﻿<div class="mb-3">
+    @if (IsTextArea)
+    {
+        <div class="d-flex flex-column gap-2">
+            <label for="@ForId" class="form-label">@TextLabel</label>
+            <textarea name="@ForId" id="@ForId" ></textarea>
+        </div>
+    }
+    else
+    {
+        if (InputType != "input")
+        {
+            <label for="@ForId" class="form-label">@TextLabel</label>
+            <input name="@ForId" type="@InputType" class="form-control" id="@ForId" placeholder="@Placeholder" />
+        }
+        else
+        {
+            <label for="@ForId" class="form-label">@TextLabel</label>
+            <input name="@ForId" type="@InputType" class="form-control" id="@ForId" placeholder="@Placeholder" />
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? TextLabel { get; set; } = "Inserisci un input";
+
+    [Parameter]
+    public string? Placeholder { get; set; } = "Inserisci un input";
+
+    [Parameter]
+    public string? InputType { get; set; } = "text";
+
+    [Parameter]
+    public string? ForId { get; set; }
+
+    [Parameter]
+    public bool IsTextArea { get; set; } = false;
+
+}

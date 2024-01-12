@@ -16,7 +16,7 @@ namespace BlazorFoto.Models
 
         [Required(ErrorMessage = "L'immagine deve avere una descrizione")]
         public string Description { get; set; }
-        public bool IsVisible { get; set; }
+        public bool IsVisible { get; set; } = true;
         public byte[]? ImageFile { get; set; }
         public string ImagePath => ImageFile is null ? "https://cdn.dribbble.com/users/476251/screenshots/2619255/attachments/523315/placeholder.png?resize=400x300&vertical=center"
                                                     : $"data:image/jpeg;base64, {Convert.ToBase64String(ImageFile)}";

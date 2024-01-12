@@ -2,64 +2,88 @@
 @page "/foto/{id:int}"
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IConfiguration Configuration 
+@attribute [StreamRendering]
+
 
 <PageTitle>Foto</PageTitle>
 
-<div class="container d-flex flex-wrap gap-5">
+<div class="d-flex flex-wrap gap-5">
     @if (foto == null)
     {
-        @if (Fotos != null)
+        @if (Fotos != null && !noResult)
         {
-            @foreach (Foto foto in Fotos?.Fotos)
+            @foreach (Foto foto in Fotos.Fotos)
             {
-                <FotoCard Name="@foto.Name"
-                          Description="@foto.Description"
-                          Img="@foto.ImagePath"
-                           />
-                <NavLink @onclick="(() => GetInfo(foto.Id))">Info</NavLink>
+                <div class="d-flex flex-column gap-3 align-items-center text-center">
+                    <FotoCard Name="@foto.Name"
+                              Description="@foto.Description"
+                              Img="@foto.ImagePath"
+                              Id="@foto.Id"
+                              Text="Info"/>
+
+                </div>
             }
+        }
+        else if(Fotos == null && noResult)
+        {
+            <p>Non ci sono foto prova a ricaricare la pagina</p>
+            <NavLink @onclick=@(()=>LoadFotos())>Ricarica</NavLink>
         }
         else
         {
-            <p>Nessuna foto disponibile.</p>
+            <Loading/>
         }
     }
     else
     {
-        <FotoCard Name="@foto.Name"
-                  Description="@foto.Description"
-                  Img="@foto.ImagePath"
-                  />
+        <div class="d-flex flex-column gap-3 align-items-center text-center">
+            <FotoCard Name="@foto.Name"
+                      Description="@foto.Description"
+                      Img="@foto.ImagePath"
+                      Goback=true
+                      Text="Torna indietro"/>
+        </div>
     }
 </div>
 
+
+
 @code {
+    [Parameter]
+    public int id { get; set; }
     private FotoResponse? Fotos;
     private Foto? foto;
+    private string? baseUrl;
+    private bool noResult = false;
 
     protected override async Task OnInitializedAsync()
     {
+        baseUrl = Configuration["ApiSettings:BaseUrl"];
+
         string currentUrl = NavigationManager.Uri;
-        
+
         if (currentUrl.EndsWith("/foto"))
         {
-            // Se l'URL termina con "/foto", fai questa chiamata API
-            Fotos = await HttpClient.GetFromJsonAsync<FotoResponse>("https://localhost:7188/api/foto/getfotos");
+            await LoadFotos();
         }
         else if (currentUrl.Contains("/foto/"))
         {
-            // Se l'URL contiene "/foto/", fai questa chiamata API
-            string idString = currentUrl.Split('/').Last();
-            if (int.TryParse(idString, out int id))
-            {
-                foto = await HttpClient.GetFromJsonAsync<Foto>($"https://localhost:7188/api/foto/getfoto/{id}");
-            }
+            await LoadFotoById();
         }
     }
 
-    private void GetInfo(int id)
+    private async Task LoadFotos(int page = 1, string search = "")
     {
-        NavigationManager.NavigateTo($"/foto/{id}");
-        foto = Fotos?.Fotos.FirstOrDefault(f => f.Id == id);
+        string apiUrl = $"{baseUrl}getfotos?page={page}&search={search}";
+        Fotos = await HttpClient.GetFromJsonAsync<FotoResponse>(apiUrl);
+        if (Fotos == null) noResult = true;
     }
+
+
+    private async Task LoadFotoById()
+    {
+        foto = await HttpClient.GetFromJsonAsync<Foto>($"{baseUrl}getfoto/{id}");
+    }
+
 }

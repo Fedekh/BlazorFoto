@@ -1,0 +1,8 @@
+﻿<div class="rz-p-12 w-50 rz-text-align-center">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } //quando uso Form posso includere figli componenti custom
+}

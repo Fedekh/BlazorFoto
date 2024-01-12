@@ -1,0 +1,65 @@
+﻿@page "/dashboard"
+@page "/dashboard/create"
+@page "/dashboard/edit"
+@layout AdminLayout
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+
+@if (currentUrl.EndsWith("/dashboard"))
+{
+    <h3>Dashboard</h3>
+    <NavLink href="dashboard/create" class="btn btn-info my-3">Crea Foto</NavLink>
+}
+else if (currentUrl.Contains("/dashboard/create"))
+{
+    <h3>create</h3>
+    <EditForm Model="@Foto" OnSubmit="@SubmitForm">
+        <label>inserisci nome</label>
+        <InputText @bind-Value="@Foto.Name" />
+        <br />
+        <br />
+        <label>Descrizione</label>
+        <InputTextArea @bind-Value="@Foto.Description" />
+        <button type="button" class="btn btn-success" @onclick="@(async () => await SubmitForm())">Crea</button>
+    </EditForm>
+}
+
+else if (currentUrl.Contains("/dashboard/edit"))
+{
+    <h3>edit</h3>
+}
+
+@code {
+    private string? currentUrl;
+    private string? previewImage;
+    private string? baseUrl;
+
+    public Foto Foto = new Foto();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUrl = NavigationManager.Uri;
+    }
+
+    private async Task SubmitForm()
+    {
+        baseUrl = Configuration["ApiSettings:BaseUrl"];
+        string apiUrl = $"{baseUrl}createfoto";
+        Console.WriteLine($"Sending data: Name={Foto.Name}, Description={Foto.Description}");
+
+        var response = await HttpClient.PostAsJsonAsync(apiUrl, Foto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("ok");
+        }
+        else
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(errorMessage);
+        }
+    }
+}

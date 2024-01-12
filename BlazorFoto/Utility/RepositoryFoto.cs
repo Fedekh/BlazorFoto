@@ -19,18 +19,22 @@ namespace BlazorFoto.Utility
             {
                 FotoResponse fotoResponse = new FotoResponse();
                 IQueryable<Foto> query = _context.Foto.AsQueryable();
+                int pageSize = 10;
+                int totalItems;
 
                 if (!string.IsNullOrEmpty(search))
                 {
                     query = query.Where(f => f.Name.Contains(search));
+                    totalItems = query.Count();
                 }
 
-                int pageSize = 10;
-                int totalItems = query.Count();
 
-                List<Foto> fotos = query.OrderBy(f => f.Id).Skip((page - 1) * pageSize)
-                    .Take(pageSize).ToList();
+                List<Foto>? fotos = query.OrderBy(f => f.Id)
+                                        .Skip((page - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToList();
 
+                totalItems = fotos.Count();
                 int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
                 fotoResponse.Fotos = fotos;
