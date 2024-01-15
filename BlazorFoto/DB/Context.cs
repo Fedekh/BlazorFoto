@@ -19,17 +19,17 @@ namespace BlazorFoto.Components.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                string connectionString = _configuration.GetConnectionString("OfficeConnection");
-                optionsBuilder.UseSqlServer(connectionString);
-            }
-
             //if (!optionsBuilder.IsConfigured)
             //{
-            //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            //    string connectionString = _configuration.GetConnectionString("OfficeConnection");
             //    optionsBuilder.UseSqlServer(connectionString);
             //}
+
+            if (!optionsBuilder.IsConfigured)
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                optionsBuilder.UseSqlServer(connectionString);
+            }
         }
     }
 }

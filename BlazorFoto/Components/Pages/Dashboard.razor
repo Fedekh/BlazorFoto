@@ -15,32 +15,41 @@
 else if (currentUrl.Contains("/dashboard/create"))
 {
     <h3>create</h3>
-    <EditForm Model="@Foto" OnSubmit="@SubmitForm">
-        <label>inserisci nome</label>
-        <InputText @bind-Value="@Foto.Name" />
-        <br />
-        <br />
-        <label>Descrizione</label>
-        <InputTextArea @bind-Value="@Foto.Description" />
-        <button type="button" class="btn btn-success" @onclick="@(async () => await SubmitForm())">Crea</button>
+
+    <EditForm FormName="FotoForm" Model="@Foto" OnValidSubmit="@SubmitForm">
+        <div class="form-group">
+            <label for="Name">Name:</label>
+            <input id="Name" @bind="Foto.Name" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <input id="Description" @bind="Foto.Description" class="form-control" />
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Salva</button>
     </EditForm>
+
 }
+
 
 else if (currentUrl.Contains("/dashboard/edit"))
 {
     <h3>edit</h3>
 }
 
+
 @code {
     private string? currentUrl;
     private string? previewImage;
     private string? baseUrl;
-
-    public Foto Foto = new Foto();
+    public Foto? Foto;
 
 
     protected override async Task OnInitializedAsync()
     {
+        Foto = new Foto();
         currentUrl = NavigationManager.Uri;
     }
 
@@ -48,18 +57,27 @@ else if (currentUrl.Contains("/dashboard/edit"))
     {
         baseUrl = Configuration["ApiSettings:BaseUrl"];
         string apiUrl = $"{baseUrl}createfoto";
-        Console.WriteLine($"Sending data: Name={Foto.Name}, Description={Foto.Description}");
 
-        var response = await HttpClient.PostAsJsonAsync(apiUrl, Foto);
+        Console.WriteLine($"Sending data: Name={Foto?.Name}, Description={Foto?.Description}");
 
-        if (response.IsSuccessStatusCode)
+        try
         {
-            Console.WriteLine("ok");
+            var response = await HttpClient.PostAsJsonAsync(apiUrl, Foto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Successfully submitted the form.");
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            var errorMessage = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(errorMessage);
+            Console.WriteLine($"Exception: {ex.Message}");
         }
     }
+
 }

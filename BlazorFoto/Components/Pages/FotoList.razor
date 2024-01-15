@@ -11,7 +11,7 @@
 <div class="d-flex flex-wrap gap-5">
     @if (foto == null)
     {
-        @if (Fotos != null && !noResult)
+        @if (Fotos != null && result)
         {
             @foreach (Foto foto in Fotos.Fotos)
             {
@@ -25,10 +25,10 @@
                 </div>
             }
         }
-        else if(Fotos == null && noResult)
+        else if (!result)
         {
             <p>Non ci sono foto prova a ricaricare la pagina</p>
-            <NavLink @onclick=@(()=>LoadFotos())>Ricarica</NavLink>
+            <NavLink class="btn btn-success" href="foto">Ricarica</NavLink>
         }
         else
         {
@@ -55,7 +55,7 @@
     private FotoResponse? Fotos;
     private Foto? foto;
     private string? baseUrl;
-    private bool noResult = false;
+    private bool result = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,6 +66,7 @@
         if (currentUrl.EndsWith("/foto"))
         {
             await LoadFotos();
+            if (Fotos?.Fotos.Count == 0) result = false;
         }
         else if (currentUrl.Contains("/foto/"))
         {
@@ -77,9 +78,8 @@
     {
         string apiUrl = $"{baseUrl}getfotos?page={page}&search={search}";
         Fotos = await HttpClient.GetFromJsonAsync<FotoResponse>(apiUrl);
-        if (Fotos == null) noResult = true;
-    }
 
+    }
 
     private async Task LoadFotoById()
     {
